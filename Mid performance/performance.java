@@ -17,19 +17,16 @@ class Employee {
         this.joiningDate = joiningDate;
     }
 
-   public int calculateVacationLeave() {
-       int totalLeaveDays = calculateTotalLeaveDays();
-       int vacationDays = getVacationDays();
-       return (int) Math.ceil((double) vacationDays * totalLeaveDays / 365);
-   }
+    public int calculateVacationLeave() {
+        int totalLeaveDays = calculateTotalLeaveDays();
+        int vacationDays = getVacationDays();
+        return calculateLeave(vacationDays, totalLeaveDays);
+    }
+
     public int calculateSickLeave() {
         int totalLeaveDays = calculateTotalLeaveDays();
         int sickDays = getSickDays();
-        if (this instanceof Staff) {
-            return sickDays < 0.5 ? 0 : 1;
-        } else {
-            return (int) Math.ceil((double) sickDays * totalLeaveDays / 365);
-        }
+        return calculateLeave(sickDays, totalLeaveDays);
     }
 
     private int calculateTotalLeaveDays() {
@@ -37,9 +34,9 @@ class Employee {
         int totalDaysInYear = joiningDate.isLeapYear() ? 366 : 365;
 
         if (Period.between(joiningDate, endOfYear).getYears() == 0) {
-            return (int)((endOfYear.getDayOfYear() - joiningDate.getDayOfYear() + 1) * totalDaysInYear / 365.0);
+            return (int) ((endOfYear.getDayOfYear() - joiningDate.getDayOfYear() + 1) * totalDaysInYear / 365.0);
         } else {
-            return (int)((endOfYear.getDayOfYear() + 1) * totalDaysInYear / 365.0);
+            return (int) ((endOfYear.getDayOfYear() + 1) * totalDaysInYear / 365.0);
         }
     }
 
@@ -49,6 +46,11 @@ class Employee {
 
     private int getSickDays() {
         return this instanceof Officer ? 10 : 7;
+    }
+
+    private int calculateLeave(int leaveDays, int totalLeaveDays) {
+        double result = (leaveDays * totalLeaveDays) / (joiningDate.isLeapYear() ? 366.0 : 365.0);
+        return result < 0.5 ? 0 : (int) Math.ceil(result);
     }
 
     public String toString() {
@@ -77,10 +79,10 @@ class Staff extends Employee {
 public class performance {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Employee[] employees = new Employee[3];
+        Employee[] employees = new Employee[3]; 
 
         for (int i = 0; i < employees.length; i++) {
-            System.out.println("Enter Employee Information:");
+            System.out.println("Enter Employee Information for Employee " + (i + 1) + ":");
 
             System.out.print("ID: ");
             int id = scanner.nextInt();
